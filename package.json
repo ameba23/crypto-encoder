@@ -1,6 +1,6 @@
 {
   "name": "crypto-encoder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple crypto encoder compatible with hypercore",
   "main": "index.js",
   "directories": {
