@@ -1,0 +1,32 @@
+{
+  "name": "crypto-encoder",
+  "version": "1.0.0",
+  "description": "A simple crypto encoder compatible with hypercore",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tape test/**/*.test.js | tap-spec"
+  },
+  "dependencies": {
+    "assert": "^2.0.0",
+    "sodium-native": "^2.4.2"
+  },
+  "devDependencies": {
+    "hypercore": "^7.5.0",
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.6.3",
+    "tap-spec": "^5.0.0",
+    "tape": "^4.11.0",
+    "tape-plus": "^1.0.0",
+    "tmp": "^0.1.0"
+  },
+  "keywords": [
+    "crypto",
+    "encoder",
+    "hypercore"
+  ],
+  "author": "Magma Collective",
+  "license": "AGPL-3.0-or-later"
+}

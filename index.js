@@ -2,7 +2,11 @@ const sodium = require('sodium-native')
 const assert = require('assert')
 const zero = sodium.sodium_memzero
 
-module.exports = function encoder (encryptionKey, opts = {}) {
+module.exports = encoder
+module.exports.encryptionKey = encryptionKey
+module.exports.KEYBYTES = sodium.crypto_secretbox_KEYBYTES
+
+function encoder (encryptionKey, opts = {}) {
   assert(Buffer.isBuffer(encryptionKey), 'encryption key must be a buffer')
   assert(encryptionKey.length === sodium.crypto_secretbox_KEYBYTES, `cobox-crypto: key must be a buffer of length ${sodium.crypto_secretbox_KEYBYTES}`)
 
@@ -39,6 +43,12 @@ module.exports = function encoder (encryptionKey, opts = {}) {
       }
     }
   }
+}
+
+function encryptionKey () {
+  const key = sodium.sodium_malloc(sodium.crypto_secretbox_KEYBYTES)
+  sodium.randombytes_buf(key)
+  return key
 }
 
 function _resolveStringEncoder (encoder) {
