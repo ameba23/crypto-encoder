@@ -27,6 +27,10 @@
     "encoder",
     "hypercore"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ameba23/crypto-encoder.git"
+  },
   "author": "Magma Collective",
   "license": "AGPL-3.0-or-later"
 }
