@@ -15,7 +15,9 @@
   },
   "devDependencies": {
     "hypercore": "^7.5.0",
+    "hyperdrive": "^9.16.0",
     "mkdirp": "^0.5.1",
+    "random-access-memory": "^3.1.1",
     "rimraf": "^2.6.3",
     "tap-spec": "^5.0.0",
     "tape": "^4.11.0",

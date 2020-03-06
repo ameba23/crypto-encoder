@@ -1,8 +1,10 @@
 const { describe } = require('tape-plus')
 const hypercore = require('hypercore')
+const hyperdrive = require('hyperdrive')
 const path = require('path')
 const fs = require('fs')
 const sodium = require('sodium-native')
+const ram = require('random-access-memory')
 
 const secretBoxEncoder = require('../')
 const chacha20Encoder = require('../cha20stream')
@@ -71,7 +73,7 @@ describe('secretbox', (context) => {
   context('hypercore - encrypt 100 megabytes of data, in 64kb blocks', (assert, next) => {
     const key = secretBoxEncoder.encryptionKey()
     const encoder = secretBoxEncoder(key)
-    const feed = hypercore(storage, { valueEncoding: encoder })
+    const feed = hypercore(ram, { valueEncoding: encoder })
     feed.on('ready', () => {
       const block = Buffer.alloc(65536)
 
@@ -106,6 +108,49 @@ describe('secretbox', (context) => {
           console.log(`Time taken to decrypt ${endRead - startRead} ms`)
           cleanup(storage, next)
         })
+      }
+    })
+  })
+
+  context('hyperdrive - encrypt 100 megabytes of data, in 64kb blocks', (assert, next) => {
+    const key = secretBoxEncoder.encryptionKey()
+    const encoder = secretBoxEncoder(key)
+    const drive = hyperdrive(ram, { valueEncoding: encoder })
+    drive.on('ready', () => {
+      const block = Buffer.alloc(65536)
+
+      let i = 0
+      const start = Date.now()
+      addBlock()
+
+      function addBlock () {
+        sodium.randombytes_buf(block)
+        drive.writeFile(`block${i}.data`, block, (err) => {
+          if (err) throw err
+          i++
+          if (i < 1600) {
+            addBlock()
+          } else {
+            done()
+          }
+        })
+      }
+      function done () {
+        const end = Date.now()
+
+        console.log(drive.content.length, drive.content.byteLength / (1024 * 1024))
+        console.log(`Time taken to encrypt ${end - start} ms`)
+
+        cleanup(storage, next)
+        // const startRead = Date.now()
+        // const readStream = feed.createReadStream()
+        // readStream.on('data', (chunk) => {
+        // })
+        // readStream.on('end', () => {
+        //   const endRead = Date.now()
+        //   console.log(`Time taken to decrypt ${endRead - startRead} ms`)
+        //   cleanup(storage, next)
+        // })
       }
     })
   })
@@ -205,7 +250,7 @@ describe('crypto_stream_chacha20_XOR_instance', (context) => {
   context('hypercore - encrypt 100 megabytes of data, in 64kb blocks', (assert, next) => {
     const key = chacha20Encoder.encryptionKey()
     const encoder = chacha20Encoder(key)
-    const feed = hypercore(storage, { valueEncoding: encoder })
+    const feed = hypercore(ram, { valueEncoding: encoder })
     feed.on('ready', () => {
       const block = Buffer.alloc(65536)
 
@@ -240,6 +285,49 @@ describe('crypto_stream_chacha20_XOR_instance', (context) => {
           console.log(`Time taken to decrypt ${endRead - startRead} ms`)
           cleanup(storage, next)
         })
+      }
+    })
+  })
+
+  context('hyperdrive - encrypt 100 megabytes of data, in 64kb blocks', (assert, next) => {
+    const key = chacha20Encoder.encryptionKey()
+    const encoder = chacha20Encoder(key)
+    const drive = hyperdrive(ram, { valueEncoding: encoder })
+    drive.on('ready', () => {
+      const block = Buffer.alloc(65536)
+
+      let i = 0
+      const start = Date.now()
+      addBlock()
+
+      function addBlock () {
+        sodium.randombytes_buf(block)
+        drive.writeFile(`block${i}.data`, block, (err) => {
+          if (err) throw err
+          i++
+          if (i < 1600) {
+            addBlock()
+          } else {
+            done()
+          }
+        })
+      }
+      function done () {
+        const end = Date.now()
+
+        console.log(drive.content.length, drive.content.byteLength / (1024 * 1024))
+        console.log(`Time taken to encrypt ${end - start} ms`)
+
+        cleanup(storage, next)
+        // const startRead = Date.now()
+        // const readStream = feed.createReadStream()
+        // readStream.on('data', (chunk) => {
+        // })
+        // readStream.on('end', () => {
+        //   const endRead = Date.now()
+        //   console.log(`Time taken to decrypt ${endRead - startRead} ms`)
+        //   cleanup(storage, next)
+        // })
       }
     })
   })
