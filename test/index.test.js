@@ -332,3 +332,85 @@ describe('crypto_stream_chacha20_XOR_instance', (context) => {
     })
   })
 })
+
+describe('no encryption', (context) => {
+  context('hypercore - add 100 megabytes of data, in 64kb blocks', (assert, next) => {
+    const feed = hypercore(ram)
+    feed.on('ready', () => {
+      const block = Buffer.alloc(65536)
+
+      let i = 0
+      const start = Date.now()
+      addBlock()
+
+      function addBlock () {
+        sodium.randombytes_buf(block)
+        feed.append(block, (err) => {
+          if (err) throw err
+          i++
+          if (i < 1600) {
+            addBlock()
+          } else {
+            done()
+          }
+        })
+      }
+      function done () {
+        const end = Date.now()
+
+        console.log(feed.length, feed.byteLength / (1024 * 1024))
+        console.log(`Time taken to add data ${end - start} ms`)
+
+        const startRead = Date.now()
+        const readStream = feed.createReadStream()
+        readStream.on('data', (chunk) => {
+        })
+        readStream.on('end', () => {
+          const endRead = Date.now()
+          console.log(`Time taken to read data ${endRead - startRead} ms`)
+          next()
+        })
+      }
+    })
+  })
+
+  context('hyperdrive - add 100 megabytes of data, in 64kb blocks', (assert, next) => {
+    const drive = hyperdrive(ram)
+    drive.on('ready', () => {
+      const block = Buffer.alloc(65536)
+
+      let i = 0
+      const start = Date.now()
+      addBlock()
+
+      function addBlock () {
+        sodium.randombytes_buf(block)
+        drive.writeFile(`block${i}.data`, block, (err) => {
+          if (err) throw err
+          i++
+          if (i < 1600) {
+            addBlock()
+          } else {
+            done()
+          }
+        })
+      }
+      function done () {
+        const end = Date.now()
+
+        console.log(drive.content.length, drive.content.byteLength / (1024 * 1024))
+        console.log(`Time taken to add data ${end - start} ms`)
+        next()
+        // const startRead = Date.now()
+        // const readStream = feed.createReadStream()
+        // readStream.on('data', (chunk) => {
+        // })
+        // readStream.on('end', () => {
+        //   const endRead = Date.now()
+        //   console.log(`Time taken to decrypt ${endRead - startRead} ms`)
+        //   cleanup(storage, next)
+        // })
+      }
+    })
+  })
+})
