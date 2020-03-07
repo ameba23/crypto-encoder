@@ -13,8 +13,6 @@ function encoder (encryptionKey, opts = {}) {
   opts.valueEncoding = _resolveStringEncoder(opts.valueEncoding)
 
   const nonce = opts.nonce || generateNonce()
-  const encryptInstance = sodium.crypto_stream_chacha20_xor_instance(nonce, encryptionKey)
-  const decryptInstance = sodium.crypto_stream_chacha20_xor_instance(nonce, encryptionKey)
 
   return {
     encode (message, buffer, offset) {
@@ -23,13 +21,13 @@ function encoder (encryptionKey, opts = {}) {
         message = opts.valueEncoding.encode(message, buffer, offset)
       }
       const ciphertext = sodium.sodium_malloc(message.length)
-      encryptInstance.update(ciphertext, message)
+      sodium.crypto_stream_chacha20_xor(ciphertext, message, nonce, encryptionKey)
       return ciphertext
     },
 
     decode (ciphertext, start, end) {
       const message = sodium.sodium_malloc(ciphertext.length)
-      decryptInstance.update(message, ciphertext)
+      sodium.crypto_stream_chacha20_xor(message, ciphertext, nonce, encryptionKey)
       // Run originally provided encoder if any
       if (opts.valueEncoding && typeof opts.valueEncoding.decode === 'function') {
         return opts.valueEncoding.decode(message, start, end)
