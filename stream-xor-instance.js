@@ -1,6 +1,5 @@
 const sodium = require('sodium-native')
 const assert = require('assert')
-// const zero = sodium.sodium_memzero
 
 module.exports = encoder
 module.exports.encryptionKey = encryptionKey
@@ -13,23 +12,18 @@ function encoder (encryptionKey, opts = {}) {
   opts.valueEncoding = _resolveStringEncoder(opts.valueEncoding)
 
   const nonce = opts.nonce || generateNonce()
-  // TODO use separate nonce for rx and tx
-  const rx = sodium.crypto_stream_xor_instance(nonce, encryptionKey)
+  // TODO use separate nonce for rx and tx? hypercore protocol does this
   const tx = sodium.crypto_stream_xor_instance(nonce, encryptionKey)
+  const rx = sodium.crypto_stream_xor_instance(nonce, encryptionKey)
 
-  const encode = function (message) {
-    // TODO should be able to do in-place encryption
-    // const ciphertext = sodium.sodium_malloc(message.length)
-    // const ciphertext = Buffer.alloc(message.length)
-    tx.update(message, message)
-    return message
+  const encode = function (data) {
+    tx.update(data, data)
+    return data
   }
 
-  const decode = function (ciphertext) {
-    // const message = sodium.sodium_malloc(ciphertext.length)
-    // const message = Buffer.alloc(ciphertext.length)
-    rx.update(ciphertext, ciphertext)
-    return ciphertext
+  const decode = function (data) {
+    rx.update(data, data)
+    return data
   }
 
   return (opts.valueEncoding && typeof opts.valueEncoding.encode === 'function')
