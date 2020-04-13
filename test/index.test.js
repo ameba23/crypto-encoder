@@ -717,18 +717,18 @@ describe('crypto_stream_XOR_instance', (context) => {
     const testEncoder = streamXORInstanceEncoder(key, { nonce: encoder.nonce })
     const feed = hypercore(storage, { valueEncoding: encoder })
 
-    const message = Buffer.from('boop beep beep boop')
+    const message = 'boop beep beep boop'
 
-    feed.append(message, (err) => {
+    feed.append(Buffer.from(message), (err) => {
       assert.error(err, 'no error')
 
       var data = fs.readFileSync(path.join(storage, 'data'))
-      assert.notSame(data.toString(), message.toString(), 'log entry is encrypted')
-      assert.same(testEncoder.decode(data).toString(), message.toString(), 'log entry is encrypted')
+      assert.notSame(data.toString(), message, 'log entry is encrypted')
+      assert.same(testEncoder.decode(data).toString(), message, 'log entry is encrypted')
 
       feed.get(0, (err, entry) => {
         assert.error(err, 'no error')
-        assert.same(entry.toString(), message.toString(), 'hypercore decrypts the message')
+        assert.same(entry.toString(), message, 'hypercore decrypts the message')
 
         cleanup(storage, next)
       })

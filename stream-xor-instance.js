@@ -20,16 +20,16 @@ function encoder (encryptionKey, opts = {}) {
   const encode = function (message) {
     // TODO should be able to do in-place encryption
     // const ciphertext = sodium.sodium_malloc(message.length)
-    const ciphertext = Buffer.alloc(message.length)
-    tx.update(ciphertext, message)
-    return ciphertext
+    // const ciphertext = Buffer.alloc(message.length)
+    tx.update(message, message)
+    return message
   }
 
   const decode = function (ciphertext) {
     // const message = sodium.sodium_malloc(ciphertext.length)
-    const message = Buffer.alloc(ciphertext.length)
-    rx.update(message, ciphertext)
-    return message
+    // const message = Buffer.alloc(ciphertext.length)
+    rx.update(ciphertext, ciphertext)
+    return ciphertext
   }
 
   return (opts.valueEncoding && typeof opts.valueEncoding.encode === 'function')
