@@ -16,8 +16,7 @@ function encoder (encryptionKey, opts = {}) {
   return {
     encode (message, buffer, offset) {
       // Run originally provided encoder if any
-      if (opts.valueEncoding) message = encoder.encode(message, buffer, offset)
-      if (!Buffer.isBuffer(message)) message = Buffer.from(message, 'utf-8')
+      message = encoder.encode(message, buffer, offset)
       const ciphertext = Buffer.alloc(message.length + sodium.crypto_secretbox_MACBYTES)
       const nonce = Buffer.alloc(sodium.crypto_secretbox_NONCEBYTES)
       sodium.randombytes_buf(nonce)
@@ -25,7 +24,6 @@ function encoder (encryptionKey, opts = {}) {
       zero(message)
       return Buffer.concat([nonce, ciphertext])
     },
-
     decode (buffer, start, end) {
       const nonce = buffer.slice(0, sodium.crypto_secretbox_NONCEBYTES)
       const messageWithMAC = buffer.slice(sodium.crypto_secretbox_NONCEBYTES)
@@ -35,8 +33,7 @@ function encoder (encryptionKey, opts = {}) {
         'Decryption failed!'
       )
       // Run originally provided encoder if any
-      if (opts.valueEncoding) return encoder.decode(message, start, end)
-      return message
+      return encoder.decode(message, start, end)
     }
   }
 }
