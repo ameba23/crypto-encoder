@@ -19,22 +19,17 @@ function encoder (encryptionKey, opts = {}) {
 
   const nonce = opts.nonce
 
-  const encrypt = function (data) {
-    sodium.crypto_stream_xor(data, data, nonce, encryptionKey)
-    return data
-  }
-
-  const decrypt = function (data) {
+  const encryptOrDecrypt = function (data) {
     sodium.crypto_stream_xor(data, data, nonce, encryptionKey)
     return data
   }
 
   return {
     encode (message, buffer, offset) {
-      return encrypt(encoder.encode(message, buffer, offset))
+      return encryptOrDecrypt(encoder.encode(message, buffer, offset))
     },
     decode (message, start, end) {
-      return encoder.decode(decrypt(message), start, end)
+      return encoder.decode(encryptOrDecrypt(message), start, end)
     }
   }
 }
