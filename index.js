@@ -18,6 +18,7 @@ function encoder (encryptionKey, opts = {}) {
   const encoder = codecs(opts.valueEncoding)
 
   const nonce = opts.nonce
+  assert(nonce, 'Nonce must be provided')
 
   const encryptOrDecrypt = function (data) {
     sodium.crypto_stream_xor(data, data, nonce, encryptionKey)
