@@ -10,7 +10,8 @@ const { cleanup, tmp } = require('./util')
 describe('message encoding', (context) => {
   context('encrypt and decrypt a message', (assert, next) => {
     const key = Encoder.encryptionKey()
-    const encoder = Encoder(key, { valueEncoding: 'utf-8' })
+    const nonce = Encoder.generateNonce()
+    const encoder = Encoder(key, { nonce, valueEncoding: 'utf-8' })
 
     const encrypted = encoder.encode('Hello World')
     assert.ok(encrypted, 'Encrypts the message')
@@ -31,19 +32,20 @@ describe('hypercore', (context) => {
 
   context('encrypted the log', (assert, next) => {
     const key = Encoder.encryptionKey()
-    const encoder = Encoder(key, { valueEncoding: 'utf-8' })
+    const nonce = Encoder.generateNonce()
+    const encoder = Encoder(key, { nonce, valueEncoding: 'utf-8' })
     const feed = hypercore(storage, { valueEncoding: encoder })
 
     feed.append('boop', (err) => {
       assert.error(err, 'no error')
 
-      var data = fs.readFileSync(path.join(storage, 'data'))
+      const data = fs.readFileSync(path.join(storage, 'data'))
       assert.notSame(data, 'boop', 'log entry is encrypted')
       assert.same(encoder.decode(data), 'boop', 'log entry is encrypted')
 
       feed.get(0, (err, entry) => {
         assert.error(err, 'no error')
-        assert.same('boop', entry, 'hypercore decrypts the message')
+        assert.same(entry, 'boop', 'hypercore decrypts the message')
 
         cleanup(storage, next)
       })
@@ -52,13 +54,18 @@ describe('hypercore', (context) => {
 
   context('encrypted the log, with a json object', (assert, next) => {
     const key = Encoder.encryptionKey()
-    const encoder = Encoder(key, { valueEncoding: 'json' })
+    const nonce = Encoder.generateNonce()
+    const encoder = Encoder(key, { nonce, valueEncoding: 'json' })
     const feed = hypercore(storage, { valueEncoding: encoder })
 
     const message = { boop: 'beep' }
 
     feed.append(message, (err) => {
       assert.error(err, 'no error')
+
+      const data = fs.readFileSync(path.join(storage, 'data'))
+      assert.notSame(JSON.stringify(data), JSON.stringify(message), 'log entry is encrypted')
+      assert.same(JSON.stringify(encoder.decode(data)), JSON.stringify(message), 'log entry is encrypted')
 
       feed.get(0, (err, entry) => {
         assert.error(err, 'no error')
