@@ -28,14 +28,12 @@ function encoder (encryptionKey, opts = {}) {
     sodium.crypto_stream_xor(data, data, nonce, encryptionKey)
     return data
   }
+
   return {
     encode (message, buffer, offset) {
-      // Run originally provided encoder if any
       return encrypt(encoder.encode(message, buffer, offset))
     },
     decode (message, start, end) {
-      // console.log(decode(message).toString())
-      // Run originally provided encoder if any
       return encoder.decode(decrypt(message), start, end)
     }
   }
