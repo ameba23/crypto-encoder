@@ -1,6 +1,6 @@
 {
   "name": "crypto-encoder",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A simple crypto encoder compatible with hypercore",
   "main": "index.js",
   "directories": {
@@ -28,6 +28,10 @@
     "encoder",
     "hypercore"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ameba23/crypto-encoder.git"
+  },
   "author": "Magma Collective",
   "license": "AGPL-3.0-or-later"
 }
