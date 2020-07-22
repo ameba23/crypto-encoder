@@ -16,6 +16,7 @@ describe('message encoding', (context) => {
     const encrypted = encoder.encode('Hello World')
     assert.ok(encrypted, 'Encrypts the message')
     assert.ok(encrypted instanceof Buffer, 'Returns a buffer')
+    assert.equals(encrypted.length, 'Hello World'.length, 'Ciphertext and plaintext are same length')
 
     const message = encoder.decode(encrypted)
     assert.same(message, 'Hello World', 'Decrypts the message')
